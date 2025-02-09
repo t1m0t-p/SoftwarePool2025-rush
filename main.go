@@ -4,7 +4,7 @@ import (
     "fmt"
     "log"
     "net/http"
-    "./router"
+	"MyTrello/server/router"
 )
 
 func main() {    

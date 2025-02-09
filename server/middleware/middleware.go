@@ -6,49 +6,45 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"../models"
+	"MyTrello/server/models"
 	"github.com/gorilla/mux"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const conectionString = "mongodb+srv://root:kJfvCatRp0BUgaZq@to-do.dtfyu.mongodb.net/?retryWrites=true&w=majority&appName=To-Do"
-
+const connectionString = "mongodb+srv://root:kJfvCatRp0BUgaZq@to-do.dtfyu.mongodb.net/?retryWrites=true&w=majority&appName=To-Do"
 const dbName = "todo"
-
 const collName = "todolist"
 
-var collection *mango.collection
+var collection *mongo.Collection
 
 func init() {
-	clientOption := options.Client().ApplyURI(conectionString)
+	clientOption := options.Client().ApplyURI(connectionString)
 
-	client, err := mango.Connect(context,context.TODO(), clientOption)
+	client, err := mongo.Connect(context.TODO(), clientOption)
 	if err != nil {
-		log.Fatal((err))
+		log.Fatal(err)
 	}
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(("connected MDB"))
+	fmt.Println("Connected to MongoDB")
 	collection = client.Database(dbName).Collection(collName)
-	fmt.Println("collection creat")
+	fmt.Println("Collection created")
 }
 
 func GetAllTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
-	w.Header().Set("Access-control-Allow-Origin", "*")
-	playload := getAlltask()
-	json.NewEncoder(w).Encode(playload)
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	payload := getAllTask()
+	json.NewEncoder(w).Encode(payload)
 }
 
-func createTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+func CreateTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -59,7 +55,6 @@ func createTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func TaskComplete(w http.ResponseWriter, r *http.Request) {
-
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "PUT")
@@ -71,7 +66,6 @@ func TaskComplete(w http.ResponseWriter, r *http.Request) {
 }
 
 func UndoTask(w http.ResponseWriter, r *http.Request) {
-
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "PUT")
@@ -83,7 +77,7 @@ func UndoTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -93,7 +87,7 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAllTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	count := deleteAllTask()
 	json.NewEncoder(w).Encode(count)
@@ -112,7 +106,6 @@ func getAllTask() []primitive.M {
 			log.Fatal(e)
 		}
 		results = append(results, result)
-
 	}
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
@@ -138,7 +131,7 @@ func taskComplete(task string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("modified count: ", result.ModifiedCount)
+	fmt.Println("Modified count: ", result.ModifiedCount)
 }
 
 func undoTask(task string) {
@@ -150,7 +143,7 @@ func undoTask(task string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("modified count: ", result.ModifiedCount)
+	fmt.Println("Modified count: ", result.ModifiedCount)
 }
 
 func deleteOneTask(task string) {
